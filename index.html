@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ViralTikTok - Tăng Tương Tác Miễn Phí</title>
-
-    <!-- FAVICON / ẢNH ĐẠI DIỆN WEBSITE -->
-    <link rel="icon" type="image/png" href="favicon.png">
-
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -100,9 +96,64 @@
         </div>
     </section>
 
+    <div class="modal" id="tiktokModal">
+        <div class="modal-overlay" onclick="closeModal('tiktokModal')"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('tiktokModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fab fa-tiktok"></i>
+                </div>
+                <h2>TikTok <span id="modal-service-name">Service</span></h2>
+                <p>Nhập liên kết TikTok của bạn bên dưới</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" style="display: block; margin-bottom: 10px; font-weight: 600;">
+                        <i class="fas fa-link"></i> Link TikTok
+                    </label>
+                    <input type="text" id="tiktok-link" class="form-input" placeholder="Dán liên kết tại đây..." autocomplete="off">
+                </div>
+
+                <div class="order-summary">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-receipt"></i> Thông tin đơn</h3>
+                    <div class="summary-item">
+                        <span>Dịch vụ</span>
+                        <span style="font-weight: bold;" id="summary-service">TikTok Views</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Số lượng</span>
+                        <span class="free-badge" id="summary-quantity" style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px;">100</span>
+                    </div>
+                    </div>
+
+                <button class="btn-submit" id="btnSubmit" onclick="submitToDiscord()">
+                    <i class="fas fa-paper-plane"></i> GỬI ĐẾN TIKTOK
+                </button>
+
+                <div class="modal-footer">
+                    <p class="disclaimer">
+                        <i class="fas fa-shield-alt"></i> Cam kết bảo mật thông tin người dùng.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content" style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <p style="color: white; margin-top: 15px;">Đang kết nối đến hệ thống Viral...</p>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="container">
-            <p>© 2026 ViralTikTok - All rights reserved</p>
+            <p>© 2026 ViralTikTok Tất cả quyền được bảo lưu</p>
         </div>
     </footer>
 
