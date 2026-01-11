@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViralTikTok - Tăng Tương Tác Miễn Phí</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <div class="beta-banner">
+        <div class="container">
+            <i class="fas fa-bolt"></i>
+            <span>Hệ thống đang hoạt động ổn định - Cập nhật 2026</span>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="." class="logo" style="text-decoration: none; color: inherit;">
+                <i class="fab fa-tiktok"></i>
+                <span>Viral<span class="highlight">TikTok</span></span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="#" class="active">Trang chủ</a>
+                <a href="#" onclick="showStatusModal(event)">Trạng thái</a>
+                <a href="#" onclick="showTermsModal(event)">Điều khoản</a>
+                <div class="mobile-menu-btn" style="display: inline-block; margin-left: 15px; cursor: pointer;">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Tăng Tương Tác <span class="typing-text">TikTok</span><span class="typing-cursor"></span></h1>
+            <p class="subtitle">Dịch vụ hỗ trợ tăng chỉ số TikTok miễn phí và an toàn</p>
+            
+            <div class="live-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Đã gửi hôm nay</span>
+                    <span class="stat-value" id="today-order-count">10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Tổng đơn xử lý</span>
+                    <span class="stat-value" id="live-order-count">5</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Người dùng online</span>
+                    <span class="stat-value" id="online-users">1</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section section-light">
+        <div class="container">
+            <div class="section-header" style="text-align: center; margin-bottom: 40px; margin-top: 40px;">
+                <h2 style="font-size: 2.2rem; font-weight: 800;">Chọn Dịch Vụ</h2>
+                <p style="color: #666; font-size: 1.1rem;">Chọn loại tương tác bạn muốn tăng để ra ở giữa</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" onclick="openServiceModal('Views', 100)">
+                    <div class="icon-box"><i class="fas fa-eye"></i></div>
+                    <h3>Tăng Views</h3>
+                    <p>Số lượng: 100</p>
+                    <button class="btn-tiktok" style="margin-top: 15px; width: 100%;">Chọn</button>
+                </div>
+
+                <div class="feature-card" onclick="openServiceModal('Tim', 25)">
+                    <div class="icon-box"><i class="fas fa-heart"></i></div>
+                    <h3>Tăng Tim</h3>
+                    <p>Số lượng: 25</p>
+                    <button class="btn-tiktok" style="margin-top: 15px; width: 100%;">Chọn</button>
+                </div>
+
+                <div class="feature-card" onclick="openServiceModal('Favourite', 10)">
+                    <div class="icon-box"><i class="fas fa-bookmark"></i></div>
+                    <h3>Tăng Favourite</h3>
+                    <p>Số lượng: 10</p>
+                    <button class="btn-tiktok" style="margin-top: 15px; width: 100%;">Chọn</button>
+                </div>
+
+                <div class="feature-card" onclick="openServiceModal('Follower', 10)">
+                    <div class="icon-box"><i class="fas fa-user-plus"></i></div>
+                    <h3>Tăng Follower</h3>
+                    <p>Số lượng: 10</p>
+                    <button class="btn-tiktok" style="margin-top: 15px; width: 100%;">Chọn</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal" id="tiktokModal">
+        <div class="modal-overlay" onclick="closeModal('tiktokModal')"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('tiktokModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fab fa-tiktok"></i>
+                </div>
+                <h2>TikTok <span id="modal-service-name">Service</span></h2>
+                <p>Nhập liên kết TikTok của bạn bên dưới</p>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" style="display: block; margin-bottom: 10px; font-weight: 600;">
+                        <i class="fas fa-link"></i> Link TikTok
+                    </label>
+                    <input type="text" id="tiktok-link" class="form-input" placeholder="Dán liên kết tại đây..." autocomplete="off">
+                </div>
+
+                <div class="order-summary">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-receipt"></i> Thông tin đơn</h3>
+                    <div class="summary-item">
+                        <span>Dịch vụ</span>
+                        <span style="font-weight: bold;" id="summary-service">TikTok Views</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Số lượng</span>
+                        <span class="free-badge" id="summary-quantity" style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px;">100</span>
+                    </div>
+                    </div>
+
+                <button class="btn-submit" id="btnSubmit" onclick="submitToDiscord()">
+                    <i class="fas fa-paper-plane"></i> GỬI ĐẾN TIKTOK
+                </button>
+
+                <div class="modal-footer">
+                    <p class="disclaimer">
+                        <i class="fas fa-shield-alt"></i> Cam kết bảo mật thông tin người dùng.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content" style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <p style="color: white; margin-top: 15px;">Đang kết nối đến hệ thống Viral...</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 ViralTikTok Tất cả quyền được bảo lưu</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
