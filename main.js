@@ -10,29 +10,61 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiveStats();
 });
 
-/* ================= LIVE STATS ================= */
+/* ================= LIVE STATS (ĐÃ SỬA) ================= */
+
+// Load số thật khi vào web
 function initLiveStats() {
     const todayElement = document.getElementById('today-order-count');
     const totalElement = document.getElementById('live-order-count');
     const onlineElement = document.getElementById('online-users');
 
-    let todayOrders = 1240;
-    let totalOrders = 45892;
+    const todayKey = "orders_today_" + new Date().toISOString().slice(0, 10);
+
+    const todayOrders = parseInt(localStorage.getItem(todayKey)) || 0;
+    const totalOrders = parseInt(localStorage.getItem("orders_total")) || 0;
 
     if (todayElement) todayElement.innerText = todayOrders.toLocaleString();
     if (totalElement) totalElement.innerText = totalOrders.toLocaleString();
 
-    setInterval(() => {
-        const online = Math.floor(Math.random() * 15) + 15;
-        if (onlineElement) onlineElement.innerText = online;
+    // Đếm người online theo tab (KHÔNG random)
+    if (onlineElement) initOnlineUsers(onlineElement);
+}
 
-        if (Math.random() > 0.7) {
-            todayOrders++;
-            totalOrders++;
-            if (todayElement) todayElement.innerText = todayOrders.toLocaleString();
-            if (totalElement) totalElement.innerText = totalOrders.toLocaleString();
-        }
-    }, 3000);
+// Tăng số khi gửi thành công
+function updateStatsAfterSubmit() {
+    const todayKey = "orders_today_" + new Date().toISOString().slice(0, 10);
+
+    let today = parseInt(localStorage.getItem(todayKey)) || 0;
+    let total = parseInt(localStorage.getItem("orders_total")) || 0;
+
+    today++;
+    total++;
+
+    localStorage.setItem(todayKey, today);
+    localStorage.setItem("orders_total", total);
+
+    document.getElementById("today-order-count").innerText = today.toLocaleString();
+    document.getElementById("live-order-count").innerText = total.toLocaleString();
+}
+
+// Online users theo số tab đang mở
+function initOnlineUsers(el) {
+    const channel = new BroadcastChannel("online_users_channel");
+    let online = 1;
+
+    el.innerText = online;
+
+    channel.postMessage("join");
+
+    channel.onmessage = (e) => {
+        if (e.data === "join") online++;
+        if (e.data === "leave") online = Math.max(1, online - 1);
+        el.innerText = online;
+    };
+
+    window.addEventListener("beforeunload", () => {
+        channel.postMessage("leave");
+    });
 }
 
 /* ================= MODAL ================= */
@@ -109,6 +141,9 @@ async function submitToDiscord() {
         if (response.ok) {
             const expiryTime = Date.now() + COOLDOWN_TIME;
             localStorage.setItem('tiktok_cooldown', expiryTime);
+
+            // 👉 CHỈ THÊM DÒNG NÀY
+            updateStatsAfterSubmit();
 
             Swal.fire({
                 icon: 'success',
