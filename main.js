@@ -6,35 +6,9 @@ const COOLDOWN_TIME = 5 * 60 * 1000; // 5 phút
 
 document.addEventListener('DOMContentLoaded', () => {
     initTypingEffect();
+    checkCooldown();
     initLiveStats();
 });
-
-/* ================= ANTI ABUSE CORE ================= */
-function fingerprint() {
-    return btoa(
-        navigator.userAgent +
-        navigator.language +
-        screen.width +
-        screen.height +
-        Intl.DateTimeFormat().resolvedOptions().timeZone
-    );
-}
-
-function setCookie(name, value, minutes) {
-    const d = new Date();
-    d.setTime(d.getTime() + minutes * 60 * 1000);
-    document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
-}
-
-function getCookie(name) {
-    return document.cookie
-        .split('; ')
-        .find(row => row.startsWith(name + '='))?.split('=')[1];
-}
-
-function getCooldownKey(link) {
-    return 'cd_' + btoa(link) + '_' + fingerprint();
-}
 
 /* ================= LIVE STATS ================= */
 function initLiveStats() {
@@ -55,8 +29,8 @@ function initLiveStats() {
         if (Math.random() > 0.7) {
             todayOrders++;
             totalOrders++;
-            todayElement.innerText = todayOrders.toLocaleString();
-            totalElement.innerText = totalOrders.toLocaleString();
+            if (todayElement) todayElement.innerText = todayOrders.toLocaleString();
+            if (totalElement) totalElement.innerText = totalOrders.toLocaleString();
         }
     }, 3000);
 }
@@ -66,25 +40,39 @@ function openServiceModal(serviceName, quantity) {
     currentService = serviceName;
     currentQuantity = quantity;
 
-    document.getElementById('modal-service-name').innerText = serviceName;
-    document.getElementById('summary-service').innerText = 'TikTok ' + serviceName;
-    document.getElementById('summary-quantity').innerText = quantity + ' (Miễn phí)';
+    const serviceNameEl = document.getElementById('modal-service-name');
+    const summaryServiceEl = document.getElementById('summary-service');
+    const summaryQuantityEl = document.getElementById('summary-quantity');
+    const modal = document.getElementById('tiktokModal');
 
-    document.getElementById('tiktokModal').classList.add('active');
+    if (!serviceNameEl || !summaryServiceEl || !summaryQuantityEl || !modal) {
+        console.error('❌ Thiếu element trong modal');
+        return;
+    }
+
+    serviceNameEl.innerText = serviceName;
+    summaryServiceEl.innerText = 'TikTok ' + serviceName;
+    summaryQuantityEl.innerText = quantity + ' (Miễn phí)';
+
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
 function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
-/* ================= SUBMIT DISCORD (ANTI LẠM DỤNG) ================= */
+/* ================= SUBMIT DISCORD ================= */
 async function submitToDiscord() {
     const linkInput = document.getElementById('tiktok-link');
+    const btnSubmit = document.getElementById('btnSubmit');
     const loading = document.getElementById('loadingOverlay');
-    const link = linkInput.value.trim();
 
+    if (!linkInput || !btnSubmit || !loading) return;
+
+    const link = linkInput.value.trim();
     if (!link) {
         Swal.fire({
             title: 'Lỗi',
@@ -95,64 +83,46 @@ async function submitToDiscord() {
         return;
     }
 
-    const key = getCooldownKey(link);
-    const now = Date.now();
-
-    const lsTime = localStorage.getItem(key);
-    const ckTime = getCookie(key);
-    const expiryTime = Math.max(lsTime || 0, ckTime || 0);
-
-    if (expiryTime && now < expiryTime) {
-        const remain = expiryTime - now;
-        const m = Math.floor(remain / 60000);
-        const s = Math.floor((remain % 60000) / 1000);
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Bị giới hạn!',
-            text: `Link này đang cooldown ${m}:${s < 10 ? '0' : ''}${s}`,
-            position: 'top'
-        });
-        return;
-    }
-
     loading.classList.add('active');
 
+    const payload = {
+        content: "🚀 **ĐƠN HÀNG MỚI TỪ VIRAL TIKTOK**",
+        embeds: [{
+            title: "Thông tin chi tiết",
+            color: 16711760,
+            fields: [
+                { name: "Dịch vụ", value: currentService, inline: true },
+                { name: "Số lượng", value: currentQuantity.toString(), inline: true },
+                { name: "Liên kết", value: link }
+            ],
+            timestamp: new Date().toISOString()
+        }]
+    };
+
     try {
-        await fetch(DISCORD_WEBHOOK, {
+        const response = await fetch(DISCORD_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: "🚀 **ĐƠN HÀNG MỚI TỪ VIRAL TIKTOK**",
-                embeds: [{
-                    title: "Thông tin chi tiết",
-                    color: 16711760,
-                    fields: [
-                        { name: "Dịch vụ", value: currentService, inline: true },
-                        { name: "Số lượng", value: currentQuantity.toString(), inline: true },
-                        { name: "Liên kết", value: link }
-                    ],
-                    timestamp: new Date().toISOString()
-                }]
-            })
+            body: JSON.stringify(payload)
         });
 
-        const expireAt = now + COOLDOWN_TIME;
-        localStorage.setItem(key, expireAt);
-        setCookie(key, expireAt, 5);
+        if (response.ok) {
+            const expiryTime = Date.now() + COOLDOWN_TIME;
+            localStorage.setItem('tiktok_cooldown', expiryTime);
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Gửi thành công!',
-            text: 'Link này đã bị khoá 5 phút trên thiết bị.',
-            confirmButtonColor: '#FF0050',
-            position: 'top'
-        });
+            Swal.fire({
+                icon: 'success',
+                title: 'Gửi thành công!',
+                text: 'Vui lòng đợi 5 phút để gửi tiếp.',
+                confirmButtonColor: '#FF0050',
+                position: 'top'
+            });
 
-        linkInput.value = '';
-        closeModal('tiktokModal');
-
-    } catch {
+            linkInput.value = '';
+            closeModal('tiktokModal');
+            startCooldownTimer(expiryTime);
+        }
+    } catch (err) {
         Swal.fire({
             title: 'Lỗi',
             text: 'Không thể kết nối Discord!',
@@ -162,6 +132,37 @@ async function submitToDiscord() {
     } finally {
         loading.classList.remove('active');
     }
+}
+
+/* ================= COOLDOWN ================= */
+function checkCooldown() {
+    const expiryTime = localStorage.getItem('tiktok_cooldown');
+    if (expiryTime && Date.now() < expiryTime) {
+        startCooldownTimer(parseInt(expiryTime));
+    }
+}
+
+function startCooldownTimer(expiryTime) {
+    const btnSubmit = document.getElementById('btnSubmit');
+    if (!btnSubmit) return;
+
+    const update = () => {
+        const remaining = expiryTime - Date.now();
+        if (remaining <= 0) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = `<i class="fas fa-paper-plane"></i> GỬI ĐẾN TIKTOK`;
+            localStorage.removeItem('tiktok_cooldown');
+            return;
+        }
+
+        btnSubmit.disabled = true;
+        const m = Math.floor(remaining / 60000);
+        const s = Math.floor((remaining % 60000) / 1000);
+        btnSubmit.innerText = `Thử lại sau ${m}:${s < 10 ? '0' : ''}${s}`;
+        setTimeout(update, 1000);
+    };
+
+    update();
 }
 
 /* ================= TYPING EFFECT ================= */
@@ -193,7 +194,7 @@ function initTypingEffect() {
     type();
 }
 
-/* ================= INFO ================= */
+/* ================= INFO MODAL ================= */
 function showStatusModal(e) {
     e.preventDefault();
     Swal.fire({ title: 'Trạng thái', text: 'Hệ thống hoạt động ổn định ✅', position: 'top' });
@@ -201,5 +202,5 @@ function showStatusModal(e) {
 
 function showTermsModal(e) {
     e.preventDefault();
-    Swal.fire({ title: 'Điều khoản', text: 'Mỗi link / thiết bị cooldown 5 phút.', position: 'top' });
+    Swal.fire({ title: 'Điều khoản', text: 'Miễn phí – cooldown 5 phút.', position: 'top' });
 }
