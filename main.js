@@ -1,5 +1,5 @@
 let currentService = 'Views';
-let currentQuantity = 100;
+let currentQuantity = 500;
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1459513490082365494/6sANPpkT-VjNS9vajuGsGiyLyQfa68X-g0TVtY5IFFRUbqB0hcZTu6Zez5IFR9GqU0Ve";
 const COOLDOWN_TIME = 5 * 60 * 1000; // 5 phút
@@ -16,8 +16,8 @@ function initLiveStats() {
     const totalElement = document.getElementById('live-order-count');
     const onlineElement = document.getElementById('online-users');
 
-    let todayOrders = 1240;
-    let totalOrders = 45892;
+    let todayOrders = 2048;
+    let totalOrders = 60583;
 
     if (todayElement) todayElement.innerText = todayOrders.toLocaleString();
     if (totalElement) totalElement.innerText = totalOrders.toLocaleString();
