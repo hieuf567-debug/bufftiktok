@@ -1,5 +1,5 @@
 let currentService = 'Views';
-let currentQuantity = 500;
+let currentQuantity = 100;
 
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1459513490082365494/6sANPpkT-VjNS9vajuGsGiyLyQfa68X-g0TVtY5IFFRUbqB0hcZTu6Zez5IFR9GqU0Ve";
 const COOLDOWN_TIME = 5 * 60 * 1000; // 5 phút
