@@ -1,7 +1,14 @@
 let currentService = 'Views';
 let currentQuantity = 100;
 
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1459513490082365494/6sANPpkT-VjNS9vajuGsGiyLyQfa68X-g0TVtY5IFFRUbqB0hcZTu6Zez5IFR9GqU0Ve";
+// CẤU HÌNH WEBHOOK RIÊNG BIỆT THEO TỪNG KÊNH BẠN CUNG CẤP
+const WEBHOOKS = {
+    'Views': 'https://discord.com/api/webhooks/1460526355140841503/BnX3LBBwVKkfaTx149s2ONIhD180dC0o05J1Mwt4YD8-TSw00f9KU6jlAZ3cZkzAYf8L',
+    'Tim': 'https://discord.com/api/webhooks/1460526481687183500/D36MPIS_-s1_Gkskd9aMldQRX8u-xseRF7ApH-cOlAYrZqRTKtdCO8j8WKDikgzUd7lu',
+    'Favourite': 'https://discord.com/api/webhooks/1460526571185242196/GHbnDe1lYECwPz9czdRQM66hzUSr60BTPnbguJ2yHvc-JijD0jXWtemciU5ZSPi09MGX',
+    'Follower': 'https://discord.com/api/webhooks/1460526661937401866/wGuVhuXYk8lOF1XGZXWDT4Pr6B53XDIw00rcE9BQcfxwX_mGbJxkI2iBk2qOr5ndO5fm'
+};
+
 const COOLDOWN_TIME = 5 * 60 * 1000;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkCooldown();
 });
 
-// HÀM KIỂM TRA LINK - ĐÃ THÊM HỖ TRỢ vt.tiktok.com
+// HÀM KIỂM TRA LINK - HỖ TRỢ CẢ LINK DÀI VÀ LINK VT.TIKTOK.COM
 function isValidTikTokLink(url, type) {
     // Regex cho link rút gọn (vt.tiktok.com)
     const shortPattern = /^https:\/\/vt\.tiktok\.com\/[\w-]+\/?$/;
@@ -83,10 +90,13 @@ async function submitToDiscord() {
     const loading = document.getElementById('loadingOverlay');
     loading.classList.add('active');
 
+    // TỰ ĐỘNG LẤY WEBHOOK TƯƠNG ỨNG VỚI DỊCH VỤ ĐANG CHỌN
+    const targetWebhook = WEBHOOKS[currentService];
+
     const payload = {
         username: "Hệ Thống ViralTikTok",
         embeds: [{
-            title: "🚀 ĐƠN HÀNG MỚI (HỖ TRỢ LINK VT)",
+            title: `🚀 ĐƠN HÀNG ${currentService.toUpperCase()} MỚI`,
             color: 16111914,
             fields: [
                 { name: "Dịch vụ", value: "Tăng " + currentService, inline: true },
@@ -98,7 +108,7 @@ async function submitToDiscord() {
     };
 
     try {
-        const res = await fetch(DISCORD_WEBHOOK, {
+        const res = await fetch(targetWebhook, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -118,7 +128,6 @@ async function submitToDiscord() {
     }
 }
 
-// Giữ nguyên các hàm phụ phía dưới
 function startCooldownTimer(exp) {
     const btn = document.getElementById('btnSubmit');
     const tick = () => {
